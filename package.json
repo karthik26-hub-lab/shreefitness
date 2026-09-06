@@ -1,0 +1,13 @@
+﻿{
+  "name": "shree-fitness-studio",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "npx serve .",
+    "build": "echo 'Production static assets ready'",
+    "preview": "npx serve ."
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

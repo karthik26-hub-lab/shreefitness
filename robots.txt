@@ -1,0 +1,6 @@
+# Robots.txt for Shree Fitness Studio (Porur, Chennai)
+User-agent: *
+Allow: /
+
+# Sitemap location for Google Search Console & Bing Webmaster
+Sitemap: https://shreefitnessstudio.com/sitemap.xml

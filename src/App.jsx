@@ -1,0 +1,900 @@
+import React, { useState, useEffect } from 'react';
+
+    const WHATSAPP_NUMBER = "9566099329";
+    const PRIMARY_CALL = "8778642342";
+    const SECONDARY_CALL = "9566099329";
+    
+    // Accurate Porur Studio Address & Targeted Google Maps URLs
+    const EXACT_ADDRESS = "No. 3, Sakthi Nagar 4th Street, Somasundaram Avenue, Porur, Chennai - 600 116. (BSNL Telephone Exchange Upstairs, Opp. to Super Saravana Stores)";
+    const MAPS_SEARCH_URL = "https://www.google.com/maps/search/?api=1&query=Sakthi+Nagar+4th+Street,+Somasundaram+Avenue,+Porur,+Chennai,+Tamil+Nadu+600116";
+    const MAPS_DIRECTIONS_URL = "https://www.google.com/maps/dir/?api=1&destination=Sakthi+Nagar+4th+Street,+Somasundaram+Avenue,+Porur,+Chennai,+Tamil+Nadu+600116";
+    const MAPS_EMBED_URL = "https://maps.google.com/maps?q=Sakthi+Nagar+4th+Street,+Porur,+Chennai+600116&t=&z=16&ie=UTF8&iwloc=&output=embed";
+
+    // Clean Local Assets
+    const LOGO_SRC = "./assets/logo.png";
+    const BANNER_DIGITAL_SRC = "./assets/banner_digital.svg";
+    const BANNER_PHYSICAL_SRC = "./assets/banner.png";
+
+    // Precision Vector SVG Icons (Consistent 2px strokes, ZERO emojis)
+    const Icons = {
+      Dumbbell: () => (
+        <svg className="w-5 h-5 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+          <path d="m6.5 6.5 11 11" /><path d="m21 21-1-1" /><path d="m3 3 1 1" />
+          <path d="m18 22 4-4" /><path d="m2 6 4-4" /><path d="m3 10 7-7" /><path d="m14 21 7-7" />
+        </svg>
+      ),
+      ShieldCheck: () => (
+        <svg className="w-5 h-5 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+          <path d="m9 12 2 2 4-4" />
+        </svg>
+      ),
+      Flame: () => (
+        <svg className="w-5 h-5 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+        </svg>
+      ),
+      Snowflake: () => (
+        <svg className="w-5 h-5 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+          <path d="m10 20-1.25-2.5L6 18" /><path d="M10 4 8.75 6.5 6 6" /><path d="m14 20 1.25-2.5L18 18" />
+          <path d="m14 4 1.25 2.5L18 6" /><path d="m17 21-3-6h-4l-3 6" /><path d="m17 3-3 6h-4L7 3" />
+          <path d="M2 12h20" /><path d="m20 10-2.5 1.25L20 14" /><path d="m4 10 2.5 1.25L4 14" />
+          <path d="m3 17 6-3v-4L3 7" /><path d="m21 17-6-3v-4l6-3" /><path d="M12 2v20" />
+        </svg>
+      ),
+      Trophy: () => (
+        <svg className="w-5 h-5 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+          <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+          <path d="M4 22h16" /><path d="M10 14.66V17c0 .55-.45 1-1 1H7" /><path d="M14 14.66V17c0 .55.45 1 1 1h2" />
+          <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+        </svg>
+      ),
+      Phone: () => (
+        <svg className="w-4 h-4 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+        </svg>
+      ),
+      MapPin: () => (
+        <svg className="w-4 h-4 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" />
+        </svg>
+      ),
+      Clock: () => (
+        <svg className="w-4 h-4 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+        </svg>
+      ),
+      WhatsApp: () => (
+        <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+          <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.075-2.001-.465-1.579-.652-2.589-2.271-2.669-2.378-.078-.107-.645-.859-.645-1.638 0-.779.409-1.162.554-1.321.144-.159.317-.198.423-.198.106 0 .212.002.304.007.098.005.228-.037.356.27.132.318.452 1.101.492 1.182.041.082.068.178.014.285-.054.107-.082.174-.162.268-.08.095-.169.211-.242.284-.081.079-.166.166-.071.328.095.162.423.698.908 1.129.624.556 1.149.728 1.312.809.163.081.258.071.354-.038.096-.11.41-.478.52-.642.11-.164.22-.137.37-.082.15.054.954.449 1.118.531.164.082.273.123.314.191.041.069.041.399-.103.804zm-3.423-12.416c-5.523 0-10 4.477-10 10 0 1.76.455 3.414 1.25 4.861l-1.328 4.855 4.973-1.304c1.408.768 3.018 1.198 4.721 1.198 5.523 0 10-4.477 10-10s-4.477-10-10-10z"/>
+        </svg>
+      ),
+      Check: () => (
+        <svg className="w-4 h-4 stroke-current fill-none stroke-[2.5]" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+      ),
+      ArrowRight: () => (
+        <svg className="w-4 h-4 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
+        </svg>
+      ),
+      External: () => (
+        <svg className="w-3.5 h-3.5 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" />
+        </svg>
+      ),
+      Directions: () => (
+        <svg className="w-3.5 h-3.5 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+          <polygon points="3 11 22 2 13 21 11 13 3 11" />
+        </svg>
+      ),
+      Copy: () => (
+        <svg className="w-3.5 h-3.5 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+          <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+        </svg>
+      ),
+      NavHome: () => (
+        <svg className="w-4 h-4 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24">
+          <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+      ),
+      NavPlans: () => (
+        <svg className="w-4 h-4 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24">
+          <rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/>
+        </svg>
+      ),
+      NavCoach: () => (
+        <svg className="w-4 h-4 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+      ),
+      NavMap: () => (
+        <svg className="w-4 h-4 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24">
+          <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/>
+        </svg>
+      ),
+      NavChat: () => (
+        <svg className="w-4 h-4 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+      )
+    };
+
+    function App() {
+      const [copiedAddress, setCopiedAddress] = useState(false);
+      const [activeTab, setActiveTab] = useState('home');
+      const [formData, setFormData] = useState({
+        name: '',
+        phone: '',
+        plan: '1 Year VIP Plan (₹6,666)',
+        slot: 'Morning (5:30 AM - 9:30 AM)'
+      });
+      const [formSent, setFormSent] = useState(false);
+
+      useEffect(() => {
+        const handleScroll = () => {
+          const sections = ['home', 'curriculum', 'plans', 'coach', 'enquiry', 'location'];
+          const scrollPosition = window.scrollY + 200;
+          for (const section of sections) {
+            const el = document.getElementById(section);
+            if (el) {
+              const top = el.offsetTop;
+              const height = el.offsetHeight;
+              if (scrollPosition >= top && scrollPosition < top + height) {
+                setActiveTab(section);
+                break;
+              }
+            }
+          }
+        };
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+      }, []);
+
+      const openWhatsAppChat = (message) => {
+        const encoded = encodeURIComponent(message);
+        window.open(`https://wa.me/91${WHATSAPP_NUMBER}?text=${encoded}`, '_blank');
+      };
+
+      const handleFormSubmit = (e) => {
+        e.preventDefault();
+        const text = `Hi Sakthi Master! I would like to join Shree Fitness Studio (Porur).\n\n• Name: ${formData.name}\n• Contact: ${formData.phone}\n• Selected Plan: ${formData.plan}\n• Preferred Shift: ${formData.slot}\n\nPlease let me know the admission procedure.`;
+        openWhatsAppChat(text);
+        setFormSent(true);
+      };
+
+      const copyAddressToClipboard = () => {
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(EXACT_ADDRESS);
+          setCopiedAddress(true);
+          setTimeout(() => setCopiedAddress(false), 3000);
+        }
+      };
+
+      const selectPlanAndScroll = (planName) => {
+        setFormData(prev => ({ ...prev, plan: planName }));
+        const el = document.getElementById('enquiry');
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      };
+
+      return (
+        <div className="min-h-screen flex flex-col pb-20 md:pb-0 text-slate-100 font-body">
+          
+          {/* 1. TOP COMMERCIAL ATHLETIC HEADER (Perfect edge-to-edge container alignment) */}
+          <header className="sticky top-0 z-40 bg-[#07070a]/92 backdrop-blur-xl border-b border-white/[0.06] py-3.5 sm:py-4">
+            <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+              <a href="#home" className="flex items-center gap-3 sm:gap-3.5 group">
+                <img 
+                  src={LOGO_SRC} 
+                  alt="Shree Fitness Studio Logo" 
+                  className="h-10 sm:h-12 w-auto object-contain transition group-hover:scale-105 drop-shadow-[0_0_12px_rgba(229,169,60,0.3)]"
+                  onError={(e) => { e.target.src = './assets/logo.png'; }}
+                />
+                <div className="flex flex-col text-left">
+                  <span className="font-display font-black text-base sm:text-xl tracking-tight leading-tight text-white uppercase">
+                    SHREE <span className="text-brand-gold">FITNESS</span> STUDIO
+                  </span>
+                  <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-neutral-400">
+                    Porur, Chennai • Unisex A/C Centre
+                  </span>
+                </div>
+              </a>
+
+              <a 
+                href="#plans" 
+                className="ember-btn px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-black font-display font-black text-xs sm:text-sm uppercase tracking-wider flex items-center gap-1.5 sm:gap-2 shadow-lg"
+              >
+                <span>Join Now</span>
+                <Icons.ArrowRight />
+              </a>
+            </div>
+          </header>
+
+          {/* MAIN COMMERCIAL CONTAINER (Generous flow, no outer box cards) */}
+          <main className="flex-1 w-full">
+            
+            {/* 2. HERO: HIGH-IMPACT CLUB STAGE (Seamless full-bleed) */}
+            <section id="home" className="relative w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-14 sm:pt-14 sm:pb-20 overflow-hidden">
+              
+              {/* Theatrical Backlight Halos */}
+              <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-brand-gold/10 rounded-full blur-[120px] pointer-events-none"></div>
+              <div className="absolute bottom-0 right-10 w-[400px] h-[300px] bg-brand-crimson/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+              <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+                
+                {/* Left Column: Bold Commercial Gym Headline */}
+                <div className="lg:col-span-7 space-y-5 text-center lg:text-left">
+                  
+                  {/* Facility Pill */}
+                  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-surface border border-brand-gold/30 text-xs font-bold text-brand-gold shadow-sm">
+                    <Icons.ShieldCheck />
+                    <span>ELITE UNISEX A/C GYM • SAKTHI NAGAR, PORUR</span>
+                  </div>
+
+                  {/* High-Impact Headline */}
+                  <h1 className="font-display font-black text-3xl sm:text-5xl lg:text-6xl text-white uppercase tracking-tight leading-[1.05]">
+                    THE BENCHMARK OF<br />
+                    <span className="gold-gradient-text">STRENGTH &amp; PHYSIQUE</span><br />
+                    IN PORUR
+                  </h1>
+
+                  {/* Slogan */}
+                  <div className="text-sm sm:text-base font-display font-black text-neutral-300 uppercase tracking-widest flex items-center justify-center lg:justify-start gap-2">
+                    <span className="text-brand-gold">★</span>
+                    <span>TRAIN HARD. BE STRONG. NO EXCUSES.</span>
+                    <span className="text-brand-gold">★</span>
+                  </div>
+
+                  <p className="text-sm sm:text-base text-neutral-300 leading-relaxed max-w-xl mx-auto lg:mx-0 font-normal">
+                    Step into Porur’s premier unisex air-conditioned fitness studio. Equipped with professional heavy free weights, imported biomechanics, and personalized workout mentorship under Founder &amp; Master Coach <strong className="text-white font-bold">Sakthi Master</strong>.
+                  </p>
+
+                  {/* Open Feature Ticker Strip */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2 max-w-lg mx-auto lg:mx-0 text-left">
+                    <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.08]">
+                      <div className="text-[10px] uppercase font-bold text-brand-gold">Facility</div>
+                      <div className="font-display font-black text-sm text-white">100% A/C Climate</div>
+                    </div>
+                    <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.08]">
+                      <div className="text-[10px] uppercase font-bold text-brand-gold">VIP Pass</div>
+                      <div className="font-display font-black text-sm text-white">₹6,666 / 1 Year</div>
+                    </div>
+                    <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.08] col-span-2 sm:col-span-1">
+                      <div className="text-[10px] uppercase font-bold text-brand-gold">Founder</div>
+                      <div className="font-display font-black text-sm text-white">Sakthi Master</div>
+                    </div>
+                  </div>
+
+                  {/* Hero CTAs */}
+                  <div className="flex flex-col sm:flex-row gap-3.5 pt-2 justify-center lg:justify-start">
+                    <a 
+                      href="#plans" 
+                      className="ember-btn px-7 py-4 rounded-xl text-black font-display font-black text-xs uppercase tracking-wider text-center"
+                    >
+                      View Membership Passes
+                    </a>
+                    <button 
+                      onClick={() => openWhatsAppChat("Hi Sakthi Master! I want to inquire about admission at Shree Fitness Studio in Porur.")}
+                      className="px-6 py-4 rounded-xl bg-emerald-950/50 border border-emerald-500/40 hover:border-emerald-400 text-emerald-300 font-display font-bold text-xs uppercase transition flex items-center justify-center gap-2 shadow-lg"
+                    >
+                      <Icons.WhatsApp />
+                      <span>WhatsApp Sakthi Master</span>
+                    </button>
+                  </div>
+
+                </div>
+
+                {/* Right Column: Hero Branded Emblem Showcase */}
+                <div className="lg:col-span-5 flex flex-col items-center justify-center">
+                  <div className="relative flex items-center justify-center p-6">
+                    {/* Theatrical Ambient Glow behind Arnold Logo */}
+                    <div className="absolute inset-0 bg-brand-gold/15 rounded-full blur-3xl scale-125 pointer-events-none"></div>
+                    
+                    <img 
+                      src={LOGO_SRC} 
+                      alt="Shree Fitness Studio Official Arnold Pose Logo" 
+                      className="w-72 sm:w-88 max-h-96 object-contain relative z-10 drop-shadow-[0_20px_40px_rgba(229,169,60,0.35)] transition duration-500 hover:scale-105"
+                      onError={(e) => { e.target.src = './assets/logo.png'; }}
+                    />
+                  </div>
+
+                  {/* Fast Landmark Callout */}
+                  <div className="inline-flex items-center gap-2 text-xs text-neutral-400 pt-2 text-center">
+                    <span className="text-brand-gold"><Icons.MapPin /></span>
+                    <span>Sakthi Nagar 4th St, Porur • Opp. Super Saravana Stores</span>
+                  </div>
+                </div>
+
+              </div>
+            </section>
+
+            {/* 4. CLUB CURRICULUM & TRAINING PILLARS */}
+            <section id="curriculum" className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 space-y-10">
+              
+              <div className="text-center max-w-2xl mx-auto space-y-2">
+                <span className="text-xs font-extrabold uppercase tracking-widest text-brand-gold">Official Curriculum</span>
+                <h2 className="font-display font-black text-2xl sm:text-4xl uppercase text-white tracking-tight">
+                  Disciplines &amp; Specializations
+                </h2>
+                <p className="text-xs sm:text-sm text-neutral-400">
+                  Comprehensive athletic training directly supervised by Sakthi Master on the floor every morning and evening.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                {/* 1. Weight Training */}
+                <div className="p-7 rounded-2xl bg-brand-surface/60 border border-white/[0.07] hover:border-brand-gold/40 transition duration-300 space-y-4">
+                  <div className="w-12 h-12 rounded-xl bg-brand-gold/10 text-brand-gold flex items-center justify-center border border-brand-gold/25">
+                    <Icons.Dumbbell />
+                  </div>
+                  <h3 className="font-display font-black text-xl uppercase text-white">Weight Training</h3>
+                  <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed font-normal">
+                    Heavy compound movements, progressive overload barbell mechanics, and dumbbell presses engineered to build raw power, bone density, and posture.
+                  </p>
+                  <ul className="text-xs text-neutral-400 space-y-2 pt-1">
+                    <li className="flex items-center gap-2"><span className="text-brand-gold">✓</span> Olympic Free Weights &amp; Racks</li>
+                    <li className="flex items-center gap-2"><span className="text-brand-gold">✓</span> Proper Squat &amp; Deadlift Form</li>
+                    <li className="flex items-center gap-2"><span className="text-brand-gold">✓</span> Functional Strength Foundation</li>
+                  </ul>
+                </div>
+
+                {/* 2. Body Building */}
+                <div className="p-7 rounded-2xl bg-brand-surface/80 border-2 border-brand-gold/50 shadow-[0_8px_32px_rgba(229,169,60,0.12)] space-y-4">
+                  <div className="w-12 h-12 rounded-xl bg-brand-gold/20 text-brand-gold flex items-center justify-center border border-brand-gold/40">
+                    <Icons.Trophy />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-display font-black text-xl uppercase text-white">Body Building</h3>
+                    <span className="text-[10px] font-display font-black px-2.5 py-1 rounded bg-brand-gold text-black uppercase">Signature</span>
+                  </div>
+                  <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed font-normal">
+                    Hypertrophy protocols, muscular symmetry, and strict mind-muscle contraction splits tailored for natural competitive physiques and aesthetic conditioning.
+                  </p>
+                  <ul className="text-xs text-neutral-300 space-y-2 pt-1">
+                    <li className="flex items-center gap-2"><span className="text-brand-gold">✓</span> Muscle Isolation &amp; Time Under Tension</li>
+                    <li className="flex items-center gap-2"><span className="text-brand-gold">✓</span> Natural Stage Conditioning Splits</li>
+                    <li className="flex items-center gap-2"><span className="text-brand-gold">✓</span> Direct Mentorship by Sakthi Master</li>
+                  </ul>
+                </div>
+
+                {/* 3. Fitness Workout */}
+                <div className="p-7 rounded-2xl bg-brand-surface/60 border border-white/[0.07] hover:border-brand-crimson/40 transition duration-300 space-y-4">
+                  <div className="w-12 h-12 rounded-xl bg-brand-crimson/10 text-brand-crimson flex items-center justify-center border border-brand-crimson/25">
+                    <Icons.Flame />
+                  </div>
+                  <h3 className="font-display font-black text-xl uppercase text-white">Fitness Workout</h3>
+                  <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed font-normal">
+                    Dynamic cardio conditioning, high-calorie burn, core strengthening, and agility conditioning designed for both men and women of all stamina levels.
+                  </p>
+                  <ul className="text-xs text-neutral-400 space-y-2 pt-1">
+                    <li className="flex items-center gap-2"><span className="text-brand-crimson">✓</span> Fat Loss &amp; Metabolic Conditioning</li>
+                    <li className="flex items-center gap-2"><span className="text-brand-crimson">✓</span> Core Endurance &amp; Stamina</li>
+                    <li className="flex items-center gap-2"><span className="text-brand-crimson">✓</span> Unisex Friendly Workouts</li>
+                  </ul>
+                </div>
+
+              </div>
+
+            </section>
+
+            {/* 5. MEMBERSHIP PASSES (Side-by-Side Comparison, 1-Year VIP @ ₹6,666 & 6-Months @ ₹5,000) */}
+            <section id="plans" className="w-full border-t border-b border-white/[0.06] bg-black/40 py-16 sm:py-24">
+              <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+                
+                <div className="text-center max-w-2xl mx-auto space-y-2">
+                  <span className="text-xs font-extrabold uppercase tracking-widest text-brand-gold">Transparent Membership Pricing</span>
+                  <h2 className="font-display font-black text-3xl sm:text-5xl uppercase text-white tracking-tight">
+                    Membership Passes
+                  </h2>
+                  <p className="text-xs sm:text-sm text-neutral-400">
+                    No hidden registration fees, no annual maintenance charges. Full unlimited air-conditioned access and daily floor guidance.
+                  </p>
+                </div>
+
+                {/* 2-Card Grid Side-by-Side */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch max-w-4xl mx-auto">
+                  
+                  {/* PLAN 1: 1 YEAR VIP PLAN (Switched to First / Flagship Card) */}
+                  <div className="relative rounded-3xl vip-glass-card p-7 sm:p-9 flex flex-col justify-between space-y-6">
+                    {/* VIP Ribbon Badge */}
+                    <div className="absolute -top-3.5 right-6 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-300 via-brand-gold to-yellow-600 text-black font-display font-black text-xs uppercase tracking-wider shadow-lg">
+                      ★ Best Value VIP
+                    </div>
+
+                    <div className="space-y-5">
+                      <div className="space-y-1">
+                        <span className="text-xs font-extrabold uppercase tracking-widest text-brand-gold">Annual All-Access Pass</span>
+                        <h3 className="font-display font-black text-2xl sm:text-3xl text-white uppercase">1 Year VIP Plan</h3>
+                        <p className="text-xs text-neutral-400">Full 365-day lifestyle commitment &amp; physical transformation</p>
+                      </div>
+
+                      <div className="pt-3 pb-4 border-b border-brand-border/90 flex items-baseline gap-2">
+                        <span className="font-display font-black text-4xl sm:text-5xl text-white">₹6,666</span>
+                        <span className="text-neutral-400 text-xs sm:text-sm font-semibold">/ 1 Full Year</span>
+                      </div>
+
+                      <div className="text-xs font-bold text-emerald-400 flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span>Outstanding Value: Only ~₹555 per month!</span>
+                      </div>
+
+                      <ul className="space-y-3.5 text-xs sm:text-sm text-neutral-200 pt-2">
+                        <li className="flex items-start gap-3">
+                          <span className="text-brand-gold mt-0.5 shrink-0"><Icons.Check /></span>
+                          <span>Full 365 Days Unlimited Air-Conditioned (A/C) Gym Access</span>
+                        </li>
+                        <li className="flex items-start gap-3">
+                          <span className="text-brand-gold mt-0.5 shrink-0"><Icons.Check /></span>
+                          <span>Complete Free Weights Zone (Heavy Dumbbells, Olympic Barbells)</span>
+                        </li>
+                        <li className="flex items-start gap-3">
+                          <span className="text-brand-gold mt-0.5 shrink-0"><Icons.Check /></span>
+                          <span>Custom Workout Split Routine (Hypertrophy / Fat Loss)</span>
+                        </li>
+                        <li className="flex items-start gap-3">
+                          <span className="text-brand-gold mt-0.5 shrink-0"><Icons.Check /></span>
+                          <span>Dietary Guidance &amp; Strict Form Correction</span>
+                        </li>
+                        <li className="flex items-start gap-3">
+                          <span className="text-brand-gold mt-0.5 shrink-0"><Icons.Check /></span>
+                          <span>Direct Daily Floor Supervision by Sakthi Master</span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div className="space-y-3 pt-6 border-t border-brand-border/90">
+                      <button 
+                        onClick={() => selectPlanAndScroll('1 Year VIP Plan (₹6,666)')}
+                        className="ember-btn w-full py-4 rounded-xl text-black font-display font-black text-xs uppercase tracking-wider text-center"
+                      >
+                        Select 1-Year VIP (₹6,666)
+                      </button>
+                      <button 
+                        onClick={() => openWhatsAppChat("Hi Sakthi Master! I want to confirm the 1 Year VIP Plan for ₹6,666 at Shree Fitness Studio.")}
+                        className="w-full py-3 rounded-xl bg-brand-surface border border-emerald-500/40 hover:border-emerald-400 text-emerald-300 font-display font-bold text-xs flex items-center justify-center gap-2 transition"
+                      >
+                        <Icons.WhatsApp />
+                        <span>Confirm 1-Yr via WhatsApp</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* PLAN 2: 6 MONTHS PLAN (Switched to Second Card) */}
+                  <div className="rounded-3xl standard-glass-card p-7 sm:p-9 flex flex-col justify-between space-y-6">
+                    <div className="space-y-5">
+                      <div className="space-y-1">
+                        <span className="text-xs font-extrabold uppercase tracking-widest text-neutral-400">Half-Yearly Commitment</span>
+                        <h3 className="font-display font-black text-2xl sm:text-3xl text-white uppercase">6 Months Plan</h3>
+                        <p className="text-xs text-neutral-400">Solid physical transformation &amp; conditioning foundation</p>
+                      </div>
+
+                      <div className="pt-3 pb-4 border-b border-white/[0.08] flex items-baseline gap-2">
+                        <span className="font-display font-black text-4xl sm:text-5xl text-white">₹5,000</span>
+                        <span className="text-neutral-400 text-xs sm:text-sm font-semibold">/ 6 Months</span>
+                      </div>
+
+                      <div className="text-xs font-bold text-brand-gold">
+                        Standard membership: ~₹833 per month
+                      </div>
+
+                      <ul className="space-y-3.5 text-xs sm:text-sm text-neutral-300 pt-2">
+                        <li className="flex items-start gap-3">
+                          <span className="text-brand-gold mt-0.5 shrink-0"><Icons.Check /></span>
+                          <span>Full Unisex Air-Conditioned (A/C) Gym Access</span>
+                        </li>
+                        <li className="flex items-start gap-3">
+                          <span className="text-brand-gold mt-0.5 shrink-0"><Icons.Check /></span>
+                          <span>Weight Training, Machines &amp; Resistance Systems</span>
+                        </li>
+                        <li className="flex items-start gap-3">
+                          <span className="text-brand-gold mt-0.5 shrink-0"><Icons.Check /></span>
+                          <span>Individual Workout Split &amp; Routine Guidance</span>
+                        </li>
+                        <li className="flex items-start gap-3">
+                          <span className="text-brand-gold mt-0.5 shrink-0"><Icons.Check /></span>
+                          <span>Cardio &amp; Core Conditioning Support</span>
+                        </li>
+                        <li className="flex items-start gap-3">
+                          <span className="text-brand-gold mt-0.5 shrink-0"><Icons.Check /></span>
+                          <span>Floor Assistance by Certified Trainers</span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div className="space-y-3 pt-6 border-t border-white/[0.08]">
+                      <button 
+                        onClick={() => selectPlanAndScroll('6 Months Plan (₹5,000)')}
+                        className="w-full py-4 rounded-xl bg-brand-surface border border-neutral-700 hover:border-brand-gold text-white font-display font-bold text-xs uppercase tracking-wider text-center transition"
+                      >
+                        Select 6-Month Plan (₹5,000)
+                      </button>
+                      <button 
+                        onClick={() => openWhatsAppChat("Hi Sakthi Master! I want to confirm the 6 Months Plan for ₹5,000 at Shree Fitness Studio.")}
+                        className="w-full py-3 rounded-xl bg-brand-surface border border-emerald-500/40 hover:border-emerald-400 text-emerald-300 font-display font-bold text-xs flex items-center justify-center gap-2 transition"
+                      >
+                        <Icons.WhatsApp />
+                        <span>Confirm 6-Mo via WhatsApp</span>
+                      </button>
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+            </section>
+
+            {/* 6. FOUNDER & HEAD COACH (COMMERCIAL CLUB PEDIGREE) */}
+            <section id="coach" className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+                
+                {/* Coach Portrait Frame */}
+                <div className="lg:col-span-4 flex flex-col items-center text-center">
+                  <div className="relative p-3 rounded-3xl bg-gradient-to-b from-brand-gold/30 to-transparent border border-brand-gold/40 shadow-2xl">
+                    <div className="w-56 h-56 sm:w-64 sm:h-64 rounded-2xl overflow-hidden bg-black flex items-center justify-center p-4">
+                      <img 
+                        src={LOGO_SRC} 
+                        alt="Sakthi Master Founder" 
+                        className="w-full h-full object-contain"
+                        onError={(e) => { e.target.src = './assets/logo.png'; }}
+                      />
+                    </div>
+                  </div>
+                  <h3 className="mt-4 font-display font-black text-xl uppercase text-white">Sakthi Master</h3>
+                  <span className="text-xs uppercase font-extrabold text-brand-gold tracking-widest">Head Coach &amp; Founder</span>
+                  <div className="text-xs text-neutral-400 mt-1">20+ Years Bodybuilding &amp; Strength Pedigree</div>
+                </div>
+
+                {/* Editorial Bio Content */}
+                <div className="lg:col-span-8 space-y-5 text-center lg:text-left">
+                  <div className="space-y-1">
+                    <span className="text-xs font-extrabold uppercase tracking-widest text-brand-gold">Coaching Philosophy</span>
+                    <h2 className="font-display font-black text-2xl sm:text-4xl uppercase text-white tracking-tight">
+                      Real Strength. Strict Form. Zero Excuses.
+                    </h2>
+                  </div>
+
+                  <p className="text-sm sm:text-base text-neutral-300 leading-relaxed font-normal">
+                    With deep expertise in competitive bodybuilding, power development, and natural athletic conditioning, Sakthi Master personally supervises every member who steps onto the floor. Unlike generic gyms where you are left alone, Shree Fitness Studio delivers hands-on form biomechanics, structured progressive overload, and disciplined nutritional guidance.
+                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs text-neutral-200">
+                    <div className="p-3.5 rounded-xl bg-brand-surface/70 border border-white/[0.06] flex items-center gap-2.5">
+                      <span className="text-brand-gold"><Icons.Check /></span>
+                      <span>Form Biomechanics</span>
+                    </div>
+                    <div className="p-3.5 rounded-xl bg-brand-surface/70 border border-white/[0.06] flex items-center gap-2.5">
+                      <span className="text-brand-gold"><Icons.Check /></span>
+                      <span>Progressive Overload</span>
+                    </div>
+                    <div className="p-3.5 rounded-xl bg-brand-surface/70 border border-white/[0.06] flex items-center gap-2.5">
+                      <span className="text-brand-gold"><Icons.Check /></span>
+                      <span>Drug-Free Natural Muscle</span>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-4 text-xs">
+                    <a 
+                      href={`tel:${PRIMARY_CALL}`} 
+                      className="px-5 py-3 rounded-xl bg-brand-surface border border-brand-gold/40 text-brand-gold font-display font-bold uppercase tracking-wider flex items-center gap-2 hover:border-brand-gold transition"
+                    >
+                      <Icons.Phone />
+                      <span>Call Sakthi Master: {PRIMARY_CALL}</span>
+                    </a>
+                    <a 
+                      href={`tel:${SECONDARY_CALL}`} 
+                      className="px-5 py-3 rounded-xl bg-brand-surface border border-white/[0.1] text-neutral-300 font-display font-bold uppercase tracking-wider flex items-center gap-2 hover:text-white transition"
+                    >
+                      <Icons.Phone />
+                      <span>Alternate: {SECONDARY_CALL}</span>
+                    </a>
+                  </div>
+                </div>
+
+              </div>
+            </section>
+
+            {/* 7. ADMISSION ENQUIRY & VISIT SCHEDULER */}
+            <section id="enquiry" className="w-full border-t border-b border-white/[0.06] bg-black/40 py-16 sm:py-24">
+              <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                
+                <div className="text-center space-y-2">
+                  <span className="text-xs font-extrabold uppercase tracking-widest text-brand-gold">Direct Admission Enquiry</span>
+                  <h2 className="font-display font-black text-3xl sm:text-4xl uppercase text-white tracking-tight">
+                    Schedule A Studio Visit
+                  </h2>
+                  <p className="text-xs sm:text-sm text-neutral-400">
+                    Submit your details below to prepare an instant admission enquiry directly for Sakthi Master on WhatsApp.
+                  </p>
+                </div>
+
+                {formSent ? (
+                  <div className="p-8 rounded-2xl bg-emerald-950/40 border border-emerald-500/50 text-center space-y-4 shadow-xl">
+                    <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 mx-auto flex items-center justify-center">
+                      <Icons.Check />
+                    </div>
+                    <h4 className="font-display font-bold text-xl text-white uppercase">Enquiry Prepared</h4>
+                    <p className="text-xs sm:text-sm text-neutral-300 max-w-sm mx-auto">
+                      Click below to launch WhatsApp and send your admission request directly to Sakthi Master.
+                    </p>
+                    <button 
+                      onClick={handleFormSubmit}
+                      className="px-7 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-display font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 mx-auto shadow-lg"
+                    >
+                      <Icons.WhatsApp />
+                      <span>Open in WhatsApp</span>
+                    </button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleFormSubmit} className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-xs uppercase font-extrabold text-neutral-300 block mb-1.5">Your Full Name</label>
+                        <input 
+                          type="text" 
+                          required 
+                          placeholder="e.g. Karthik" 
+                          value={formData.name} 
+                          onChange={e => setFormData({...formData, name: e.target.value})}
+                          className="w-full px-4 py-3.5 rounded-xl bg-brand-surface border border-white/[0.1] text-white text-sm focus:border-brand-gold focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs uppercase font-extrabold text-neutral-300 block mb-1.5">WhatsApp / Phone Number</label>
+                        <input 
+                          type="tel" 
+                          required 
+                          placeholder="10-digit mobile number" 
+                          value={formData.phone} 
+                          onChange={e => setFormData({...formData, phone: e.target.value})}
+                          className="w-full px-4 py-3.5 rounded-xl bg-brand-surface border border-white/[0.1] text-white text-sm focus:border-brand-gold focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-xs uppercase font-extrabold text-neutral-300 block mb-1.5">Selected Membership Plan</label>
+                        <select 
+                          value={formData.plan} 
+                          onChange={e => setFormData({...formData, plan: e.target.value})}
+                          className="w-full px-4 py-3.5 rounded-xl bg-brand-surface border border-white/[0.1] text-white text-sm focus:border-brand-gold focus:outline-none"
+                        >
+                          <option value="1 Year VIP Plan (₹6,666)">1 Year VIP Plan — ₹6,666 (Best Value)</option>
+                          <option value="6 Months Plan (₹5,000)">6 Months Plan — ₹5,000</option>
+                          <option value="Personal Training with Sakthi Master">Personal 1-on-1 Training</option>
+                          <option value="Studio Walk-in & Consultation">Studio Walk-in & Consultation</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-xs uppercase font-extrabold text-neutral-300 block mb-1.5">Preferred Workout Shift</label>
+                        <select 
+                          value={formData.slot} 
+                          onChange={e => setFormData({...formData, slot: e.target.value})}
+                          className="w-full px-4 py-3.5 rounded-xl bg-brand-surface border border-white/[0.1] text-white text-sm focus:border-brand-gold focus:outline-none"
+                        >
+                          <option value="Morning (5:30 AM - 9:30 AM)">Morning (5:30 AM - 9:30 AM)</option>
+                          <option value="Evening (4:30 PM - 9:30 PM)">Evening (4:30 PM - 9:30 PM)</option>
+                          <option value="Sunday Batch (7:00 AM - 11:00 AM)">Sunday Batch (7:00 AM - 11:00 AM)</option>
+                          <option value="Flexible Shift">Flexible Shift</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="pt-2">
+                      <button 
+                        type="submit" 
+                        className="ember-btn w-full py-4 rounded-xl text-black font-display font-black text-xs uppercase tracking-wider shadow-lg flex items-center justify-center gap-2"
+                      >
+                        <Icons.WhatsApp />
+                        <span>Send Admission Request to Sakthi Master on WhatsApp</span>
+                      </button>
+                      <p className="text-[11px] text-neutral-400 text-center mt-2">
+                        *Pre-fills your name, selected plan &amp; timing in WhatsApp for an immediate response.
+                      </p>
+                    </div>
+                  </form>
+                )}
+              </div>
+            </section>
+
+            {/* 8. LOCATION, MAP & LANDMARK DIRECTIONS */}
+            <section id="location" className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 space-y-10">
+              
+              <div className="text-center max-w-2xl mx-auto space-y-2">
+                <span className="text-xs font-extrabold uppercase tracking-widest text-brand-gold">Location &amp; Visit</span>
+                <h2 className="font-display font-black text-3xl sm:text-4xl uppercase text-white tracking-tight">
+                  Find Us in Porur, Chennai
+                </h2>
+                <p className="text-xs sm:text-sm text-neutral-400">
+                  Centrally located on Somasundaram Avenue, right opposite Super Saravana Stores.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                {/* Left: Address & Directions Cards */}
+                <div className="lg:col-span-5 space-y-4">
+                  <div className="p-6 rounded-2xl bg-brand-surface/80 border border-white/[0.08] space-y-3">
+                    <div className="flex items-center gap-2 text-brand-gold font-display font-bold text-xs uppercase">
+                      <Icons.MapPin />
+                      <span>Official Studio Address</span>
+                    </div>
+                    <p className="text-sm text-white font-medium leading-relaxed">
+                      {EXACT_ADDRESS}
+                    </p>
+                    <div className="text-xs text-brand-gold font-semibold pt-1">
+                      Landmark: Opp. to Super Saravana Stores &amp; BSNL Telephone Exchange (Upstairs)
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="p-4 rounded-xl bg-brand-surface/70 border border-white/[0.06] space-y-1">
+                      <div className="text-[11px] font-bold text-brand-gold uppercase flex items-center gap-1.5">
+                        <Icons.Clock />
+                        <span>Daily Timings</span>
+                      </div>
+                      <div className="text-xs text-neutral-200">
+                        <strong>Mon–Sat:</strong> 5:30 AM–9:30 PM<br />
+                        <strong className="text-brand-gold">Sunday:</strong> 7:00 AM–11:00 AM
+                      </div>
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-brand-surface/70 border border-white/[0.06] space-y-1">
+                      <div className="text-[11px] font-bold text-brand-gold uppercase flex items-center gap-1.5">
+                        <Icons.Phone />
+                        <span>Direct Lines</span>
+                      </div>
+                      <div className="text-xs text-neutral-200">
+                        <a href={`tel:${PRIMARY_CALL}`} className="text-brand-gold font-bold hover:underline block">
+                          {PRIMARY_CALL}
+                        </a>
+                        <a href={`tel:${SECONDARY_CALL}`} className="text-neutral-300 font-semibold hover:underline block">
+                          {SECONDARY_CALL}
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-wrap gap-2.5 pt-1">
+                    <a 
+                      href={MAPS_SEARCH_URL} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="px-4 py-3 rounded-xl bg-brand-surface border border-brand-gold/50 hover:border-brand-gold text-brand-gold font-display font-bold text-xs uppercase flex items-center gap-1.5 transition shadow-sm"
+                    >
+                      <Icons.MapPin />
+                      <span>Open Exact Location Pin</span>
+                      <Icons.External />
+                    </a>
+
+                    <a 
+                      href={MAPS_DIRECTIONS_URL} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="px-4 py-3 rounded-xl bg-brand-surface border border-white/[0.1] hover:border-white/[0.3] text-neutral-200 font-display font-bold text-xs uppercase flex items-center gap-1.5 transition"
+                    >
+                      <Icons.Directions />
+                      <span>Get Directions</span>
+                      <Icons.External />
+                    </a>
+
+                    <button 
+                      onClick={copyAddressToClipboard}
+                      className="px-4 py-3 rounded-xl bg-brand-surface border border-white/[0.1] hover:border-white/[0.3] text-neutral-300 text-xs font-semibold flex items-center gap-1.5 transition"
+                    >
+                      <Icons.Copy />
+                      <span>{copiedAddress ? "Address Copied!" : "Copy Full Address"}</span>
+                    </button>
+                  </div>
+
+                </div>
+
+                {/* Right: Embedded Google Map */}
+                <div className="lg:col-span-7">
+                  <div className="relative rounded-3xl overflow-hidden border border-white/[0.12] h-80 sm:h-96 bg-neutral-900 shadow-2xl">
+                    <iframe 
+                      title="Shree Fitness Studio Location Map"
+                      src={MAPS_EMBED_URL}
+                      width="100%" 
+                      height="100%" 
+                      style={{ border: 0 }} 
+                      allowFullScreen="" 
+                      loading="lazy"
+                      className="grayscale contrast-125 opacity-90 hover:opacity-100 hover:grayscale-0 transition duration-300"
+                    ></iframe>
+                    
+                    {/* Floating Map Banner */}
+                    <a 
+                      href={MAPS_SEARCH_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="absolute bottom-3 left-3 right-3 bg-black/90 backdrop-blur-md p-3 rounded-xl border border-white/[0.1] text-xs text-neutral-300 flex items-center justify-between hover:border-brand-gold transition"
+                    >
+                      <span className="font-semibold text-white truncate mr-2">📍 Sakthi Nagar 4th St, Porur (Opp. Saravana Stores)</span>
+                      <span className="text-brand-gold font-bold shrink-0 flex items-center gap-1">
+                        Open Map Pin <Icons.External />
+                      </span>
+                    </a>
+                  </div>
+                </div>
+
+              </div>
+
+            </section>
+
+          </main>
+
+          {/* 9. COMMERCIAL FOOTER */}
+          <footer className="border-t border-white/[0.08] py-10 px-4 text-center text-neutral-400 text-xs">
+            <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <img 
+                  src={LOGO_SRC} 
+                  alt="Shree Fitness Studio" 
+                  className="h-8 w-auto object-contain"
+                  onError={(e) => { e.target.src = './assets/logo.png'; }}
+                />
+                <span className="font-display font-black text-white uppercase tracking-tight">Shree Fitness Studio</span>
+                <span className="text-neutral-500">•</span>
+                <span>Unisex A/C Gym</span>
+              </div>
+              <p>© {new Date().getFullYear()} Shree Fitness Studio. No. 3 Sakthi Nagar 4th St, Porur, Chennai - 600 116.</p>
+            </div>
+          </footer>
+
+          {/* 10. DOCKED MOBILE 5-TAB APP DOCK (Safe-area padded, zero dead space) */}
+          <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#07070a]/95 backdrop-blur-xl border-t border-white/[0.08] h-14">
+            <div className="grid grid-cols-5 h-full">
+              
+              <a 
+                href="#home" 
+                className={`flex flex-col items-center justify-center text-[10px] font-display font-bold uppercase ${activeTab === 'home' ? 'text-brand-gold' : 'text-neutral-400'}`}
+              >
+                <Icons.NavHome />
+                <span className="mt-0.5">Home</span>
+              </a>
+
+              <a 
+                href="#curriculum" 
+                className={`flex flex-col items-center justify-center text-[10px] font-display font-bold uppercase ${activeTab === 'curriculum' ? 'text-brand-gold' : 'text-neutral-400'}`}
+              >
+                <Icons.Dumbbell />
+                <span className="mt-0.5">Programs</span>
+              </a>
+
+              <a 
+                href="#plans" 
+                className={`flex flex-col items-center justify-center text-[10px] font-display font-bold uppercase ${activeTab === 'plans' ? 'text-brand-gold' : 'text-neutral-400'}`}
+              >
+                <Icons.NavPlans />
+                <span className="mt-0.5">Plans</span>
+              </a>
+
+              <a 
+                href="#coach" 
+                className={`flex flex-col items-center justify-center text-[10px] font-display font-bold uppercase ${activeTab === 'coach' ? 'text-brand-gold' : 'text-neutral-400'}`}
+              >
+                <Icons.NavCoach />
+                <span className="mt-0.5">Coach</span>
+              </a>
+
+              <a 
+                href="#location" 
+                className={`flex flex-col items-center justify-center text-[10px] font-display font-bold uppercase ${activeTab === 'location' ? 'text-brand-gold' : 'text-neutral-400'}`}
+              >
+                <Icons.NavMap />
+                <span className="mt-0.5">Location</span>
+              </a>
+
+            </div>
+          </nav>
+
+        </div>
+      );
+    }
+
+export default App;
